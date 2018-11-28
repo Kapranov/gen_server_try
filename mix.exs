@@ -29,10 +29,11 @@ defmodule GenServerTry.MixProject do
     [
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10.1", only: :test},
+      {:ex_doc, "~> 0.19.1"},
       {:ex_unit_notifier, "~> 0.1.4", only: :test},
+      {:gen_stage, "~> 0.14.1"},
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
-      {:remix, "~> 0.0.2", only: :dev},
-      {:ex_doc, "~> 0.19.1"}
+      {:remix, "~> 0.0.2", only: :dev}
     ]
   end
 
