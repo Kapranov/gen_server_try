@@ -2,7 +2,7 @@ defmodule GenServerTryTest do
   use ExUnit.Case
   doctest GenServerTry
 
-  test "greets the world" do
-    assert GenServerTry.hello() == :world
+  test "the truth" do
+    assert 1 + 1 == 2
   end
 end
