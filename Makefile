@@ -44,6 +44,10 @@ report:
 			$(V)mix coveralls.html
 			$(V)mix coveralls.json
 
+doc:
+			$(V)MIX_ENV=dev
+			$(V)mix docs
+
 test:
 			$(V)clear
 			$(V)echo -en "\n\t$(INFO_COLOR)Run server tests:$(NO_COLOR)\n\n"
@@ -64,6 +68,6 @@ start: kill
 			$(V)echo -en "\n\t$(STAT_COLOR) Run server http://localhost:$(NO_COLOR)$(INFO_COLOR)PORT$(NO_COLOR)\n"
 			$(V)iex -S mix
 
-all: test credo report start
+all: test credo report doc start
 
-.PHONY: test halt
+.PHONY: test halt doc

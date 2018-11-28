@@ -15,8 +15,10 @@ defmodule GenServerTry.MixProject do
         "coveralls.html": :test,
         "coveralls.json": :test
       ],
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
+
   end
 
   def application do
@@ -28,8 +30,9 @@ defmodule GenServerTry.MixProject do
   defp deps do
     [
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
+      {:earmark, "~> 1.3", only: :dev},
       {:excoveralls, "~> 0.10.1", only: :test},
-      {:ex_doc, "~> 0.19.1"},
+      {:ex_doc, "~> 0.19", only: :dev},
       {:ex_unit_notifier, "~> 0.1.4", only: :test},
       {:gen_stage, "~> 0.14.1"},
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
@@ -39,4 +42,14 @@ defmodule GenServerTry.MixProject do
 
   defp applications(:dev), do: applications(:all) ++ [:remix]
   defp applications(_all), do: [:logger]
+
+  defp docs do
+    [
+      name: "GenServerTry",
+      main: "GenServerTry",
+      homepage_url: "http://localhost",
+      source_url: "https://github.com/kapranov/gen_server_try",
+      extras: ["README.md"]
+    ]
+  end
 end
