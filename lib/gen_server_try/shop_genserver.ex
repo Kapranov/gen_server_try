@@ -44,6 +44,16 @@ defmodule GenServerTry.ShopGenserver do
   def count(pid), do: GenServer.call(pid, :count)
 
   @doc """
+  Delete first item from list in cart
+
+  ## Example
+
+      iex> GenServerTry.ShopGenserver.fetch(pid)
+      :ok
+  """
+  def fetch(pid), do: GenServer.call(pid, :fetch)
+
+  @doc """
   Reset all items and create empty list
 
   ## Example
@@ -117,6 +127,16 @@ defmodule GenServerTry.ShopGenserver do
 
   @impl true
   @doc """
+  Invoked to handle synchronous callback `call/3` messages: `:fetch`
+  """
+  def handle_call(:fetch, _from, list) do
+    item = list |> List.first
+    updated = Enum.reject(list, &(&1 == item))
+    {:reply, :ok, updated}
+  end
+
+  @impl true
+  @doc """
   Invoked to handle synchronous callback `call/3` messages: `:reset`
   """
   def handle_call(:reset, _from, _list) do
@@ -129,7 +149,7 @@ defmodule GenServerTry.ShopGenserver do
   Invoked to handle asynchronous callback `cast/2` messages: `:add`
   """
   def handle_cast({:add, item}, list) do
-    updated = [item|list]
+    updated = [item|list] |> List.flatten
     {:noreply, updated}
   end
 
