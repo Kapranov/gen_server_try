@@ -34,6 +34,16 @@ defmodule GenServerTry.ShopGenserver do
   def show(pid), do: GenServer.call(pid, :show)
 
   @doc """
+  Count all items in cart
+
+  ## Example
+
+      iex> GenServerTry.ShopGenserver.count(pid)
+      0
+  """
+  def count(pid), do: GenServer.call(pid, :count)
+
+  @doc """
   Reset all items and create empty list
 
   ## Example
@@ -92,7 +102,17 @@ defmodule GenServerTry.ShopGenserver do
   Invoked to handle synchronous callback `call/3` messages: `:show`
   """
   def handle_call(:show, _from, list) do
-    {:reply, list, list}
+    sorted = list |> Enum.sort
+    {:reply, sorted, list}
+  end
+
+  @impl true
+  @doc """
+  Invoked to handle synchronous callback `call/3` messages: `:count`
+  """
+  def handle_call(:count, _from, list) do
+    counter = list |> length
+    {:reply, counter, list}
   end
 
   @impl true
