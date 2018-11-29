@@ -78,7 +78,9 @@ defmodule GenServerTry.ShopAgent do
       iex> GenServerTry.ShopAgent.add(pid, "item-1")
       :ok
   """
-  def add(pid, item), do: Agent.update(pid, &([item | &1]))
+  def add(pid, item) do
+    Agent.update(pid, &([item | &1] |> List.flatten))
+  end
 
   @doc """
   Delete item from cart.
