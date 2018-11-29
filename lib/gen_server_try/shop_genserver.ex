@@ -15,11 +15,6 @@ defmodule GenServerTry.ShopGenserver do
 
   @doc """
   Starts a `GenServer` process linked to the current process.
-
-  ## Example
-
-      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
-      {:ok, #PID<0.194.0>}
   """
   def start_link, do: GenServer.start_link(@name, [])
 
@@ -28,6 +23,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.show(pid)
       []
   """
@@ -38,6 +34,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.count(pid)
       0
   """
@@ -48,6 +45,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.fetch(pid)
       :ok
   """
@@ -58,6 +56,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.reset(pid)
       []
   """
@@ -68,6 +67,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.add(pid, "item-1")
       :ok
   """
@@ -78,7 +78,9 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.del(pid, "item-1")
+      :ok
   """
   def del(pid, item), do: GenServer.cast(pid, {:del, item})
 
@@ -87,6 +89,7 @@ defmodule GenServerTry.ShopGenserver do
 
   ## Example
 
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
       iex> GenServerTry.ShopGenserver.stop(pid)
       :ok
   """
