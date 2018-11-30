@@ -56,6 +56,13 @@ defmodule GenServerTry.ShopAgent do
     end)
   end
 
+  @doc false
+  def pop(pid) do
+    Agent.get_and_update pid, fn [item | last] ->
+      {item, last}
+    end
+  end
+
   @doc """
   Reset all items and create empty list
   Gets an agent value via the given function.

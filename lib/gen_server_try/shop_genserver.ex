@@ -139,7 +139,7 @@ defmodule GenServerTry.ShopGenserver do
   Invoked to handle synchronous callback `call/3` messages: `:count`
   """
   def handle_call(:count, _from, list) do
-    counter = list |> Kernel.length
+    counter = Enum.count(list)
     {:reply, counter, list}
   end
 
