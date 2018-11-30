@@ -66,7 +66,9 @@ defmodule GenServerTry.ShopAgent do
       iex> GenServerTry.ShopAgent.reset(pid)
       :ok
   """
-  def reset(pid), do: Agent.update(pid, fn(_state) -> [] end)
+  def reset(pid) do
+    Agent.update(pid, fn(_state) -> [] end)
+  end
 
   @doc """
   Add item to cart.

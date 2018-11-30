@@ -74,6 +74,21 @@ defmodule GenServerTry.ShopGenserver do
   def add(pid, item), do: GenServer.cast(pid, {:add, item})
 
   @doc """
+  Update item to new item
+
+  ## Example
+
+      iex> {:ok, pid} = GenServerTry.ShopGenserver.start_link
+      iex> GenServerTry.ShopGenserver.add(pid, "item-1")
+      :ok
+      iex> GenServerTry.ShopGenserver.update(pid, "item-1", "item-0")
+      :ok
+  """
+  def update(pid, old_item, new_item) do
+    GenServer.cast(pid, {:update, old_item, new_item})
+  end
+
+  @doc """
   Delete item from cart
 
   ## Example
@@ -153,6 +168,22 @@ defmodule GenServerTry.ShopGenserver do
   """
   def handle_cast({:add, item}, list) do
     updated = [item|list] |> List.flatten
+    {:noreply, updated}
+  end
+
+  @impl true
+  @doc """
+  Invoked to handle asynchronous callback `cast/2` messages: `:update`
+  """
+  def handle_cast({:update, old_item, new_item}, list) do
+    [hd|_] =
+      list
+      |> Enum.with_index
+      |> Enum.filter(fn {n, _} -> n == old_item end)
+      |> Enum.map(fn {_, n} -> n end)
+
+    updated = List.replace_at(list, hd, new_item)
+
     {:noreply, updated}
   end
 

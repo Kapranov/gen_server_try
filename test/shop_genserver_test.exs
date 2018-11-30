@@ -44,6 +44,16 @@ defmodule ShopGenserverTest do
     assert ShopGenserver.show(pid)  == [""]
   end
 
+  test "update item to new item", %{pid: pid} do
+    ShopGenserver.add(pid, "item-1")
+
+    assert ShopGenserver.count(pid) == 1
+    assert ShopGenserver.show(pid)  == ["item-1"]
+    assert ShopGenserver.update(pid, "item-1", "item-0")  == :ok
+    assert ShopGenserver.count(pid) == 1
+    assert ShopGenserver.show(pid)  == ["item-0"]
+  end
+
   test "del some item", %{pid: pid} do
     items = ~w|item-1 item-2 item-3|s
     updated = ~w|item-1 item-3|s
