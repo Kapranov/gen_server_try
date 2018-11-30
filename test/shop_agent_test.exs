@@ -102,7 +102,7 @@ defmodule ShopAgentTest do
 
     assert ShopAgent.count(pid) == 3
     assert ShopAgent.show(pid)  == items
-    assert ShopAgent.reset(pid) == :ok
+    assert ShopAgent.reset(pid) == []
     assert ShopAgent.count(pid) == 0
     assert ShopAgent.show(pid)  == []
   end

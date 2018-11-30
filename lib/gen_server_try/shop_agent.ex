@@ -64,10 +64,10 @@ defmodule GenServerTry.ShopAgent do
 
       iex> {:ok, pid} = GenServerTry.ShopAgent.start_link
       iex> GenServerTry.ShopAgent.reset(pid)
-      :ok
+      []
   """
   def reset(pid) do
-    Agent.update(pid, fn(_state) -> [] end)
+    Agent.get_and_update(pid, fn _state -> {[], []} end)
   end
 
   @doc """
