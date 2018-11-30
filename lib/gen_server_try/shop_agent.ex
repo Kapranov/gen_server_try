@@ -82,6 +82,29 @@ defmodule GenServerTry.ShopAgent do
     Agent.update(pid, &([item | &1] |> List.flatten))
   end
 
+  @doc"""
+  Update item to new item
+  Gets an agent value via the given function.
+
+  ## Example
+
+      iex> {:ok, pid} = GenServerTry.ShopAgent.start_link
+      iex> GenServerTry.ShopAgent.add(pid, "item-1")
+      :ok
+      iex> GenServerTry.ShopAgent.update(pid, "item-1", "item-0")
+      :ok
+  """
+  def update(pid, old_item, new_item) do
+    Agent.update(pid, fn items ->
+      [hd|_] = items
+                |> Enum.with_index
+                |> Enum.filter(fn {n, _} -> n == old_item end)
+                |> Enum.map(fn {_, n} -> n end)
+
+      List.replace_at(items, hd, new_item)
+    end)
+  end
+
   @doc """
   Delete item from cart.
   Gets an agent value via the given function.
