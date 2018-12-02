@@ -55,7 +55,7 @@ defmodule GenServerTry.ShopQueue do
 
       iex> {:ok, pid} = GenServerTry.ShopQueue.start_link
       iex> GenServerTry.ShopQueue.reset(pid)
-      {[], []}
+      []
   """
   def reset(pid), do: GenServer.call(pid, :reset)
 
@@ -147,8 +147,9 @@ defmodule GenServerTry.ShopQueue do
   Invoked to handle synchronous callback `call/3` messages: `:reset`
   """
   def handle_call(:reset, _from, _queue) do
+    list = []
     queue = :queue.new
-    {:reply, queue, queue}
+    {:reply, list, queue}
   end
 
   @impl true
@@ -156,7 +157,14 @@ defmodule GenServerTry.ShopQueue do
   Invoked to handle asynchronous callback `cast/2` messages: `:add`
   """
   def handle_cast({:add, item}, queue) do
-    {:noreply, :queue.in(item, queue)}
+    data = :queue.in(item, queue)
+
+    updated = data
+              |> :queue.to_list
+              |> List.flatten
+              |> :queue.from_list
+
+    {:noreply, updated}
   end
 
   @impl true
