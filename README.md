@@ -266,22 +266,98 @@ db1
 #=> ["dataItem1-1", "dataItem1-2", "dataItem1-3"]
 ```
 
+```
+def handle_call(event, _from, {queue}),
+  do {:reply, :ok, [], {:queue.in(event, queue)}}
+
+
+def handle_call(event, _from, {queue, 0}),
+  do {:reply, :ok, [], {:queue.in(event, queue), 0}}
+
+ def handle_call(event, _from, {queue, demand}),
+  do {:reply, :ok, [event], {queue, demand-1}}
+
+def handle_demand(_new_demand, {queue}) do
+  Logger.info("producer: new demand")
+  case :queue.out(queue) do
+    {{:value, event}, queue} ->
+      {:noreply, [event], {queue}}
+    {:empty, queue} ->
+      Logger.info("producer: empty queue")
+      {:noreply, [], {queue}}
+  end
+end
+```
+
 **GenStage OTP**
+
+What is GenStage? From the official documentation, it is a
+"specification and computational flow for Elixir", but what does that
+mean.
+
+What it means is that GenStage provides a way for us to define a
+pipeline of work to be carried out by independent steps (or stages) in
+a separate processes; if you've worked with pipelines before then some
+of these concepts should be familiar.
+
+To better understand how this works, let's visualize a simple
+producer-consumer flow:
+
+```
+[A] -> [B] -> [C]
+```
+
+In this example we have three stages: `A` a producer, `B` a producer-
+consumer, and `C` a consumer.
+`A` produces a value which is consumed by `B`, `B` performs some work
+and returns a new value which is received by our consumer `C`; the
+role of our stage is important as we'll see in the next section.
+
+To better illustrate these concepts we'll be constructing a pipeline
+with GenStage but first let's explore the roles that GenStage relies
+upon a bit further.
+
+As we've read, the role we give our stage is important. The GenStage
+specification recognizes three roles:
+
+* `:producer` - A source. Producers wait for demand from consumers and
+  respond with the requested events.
+* `:producer_consumer` - Both a source and a sink. Producer-consumers
+  can respond to demand from other consumers as well as request events
+  from producers.
+* `:consumer` - A sink. A consumer requests and receives data from
+  producers.
+
+Notice that our producers wait for demand?  With GenStage our consumers
+send demand upstream and process the data from our producer. This
+facilitates a mechanism known as back-pressure. Back-pressure puts the
+onus on the producer to not over-pressure when consumers are busy.
+
+Now that we've covered the roles within GenStage let's start on our
+example in code `lib/gen_server_try/shop_genstage.ex`
+
 
 ### 28 November 2018 by Oleg G.Kapranov
 
-[1]: http://erlang.org/doc/man/queue.html
-[2]: https://youtu.be/M78r_PDlw2c
-[3]: https://github.com/wfgilman/stage_test
-[4]: https://github.com/cloud8421/osteria
-[5]: https://github.com/ybur-yug/genstage_tutorial
-[6]: https://elixirschool.com/en/lessons/advanced/gen-stage
-[7]: https://gist.github.com/BruOp/fdf6513e2df4274f9266c9cb5ee8a7fb
-[8]: https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
-[9]: https://sheharyar.me/blog/understanding-genstage-elixir/
-[10]: https://blog.emerleite.com/using-elixir-genstage-to-track-video-watch-progress-9b114786c604
-[11]: http://www.elixirfbp.org/2016/07/genstage-example.html
-[12]: http://www.elixirfbp.org/2016/08/genstage-example-no-3-dispatching.html
-[13]: https://github.com/pcmarks/genstage_example
-[14]: https://github.com/pcmarks/genstage_example_2
-[15]: https://github.com/pcmarks/gen_stage_example_3
+[1]:  http://erlang.org/doc/man/queue.html
+[2]:  https://youtu.be/M78r_PDlw2c
+[3]:  https://github.com/wfgilman/stage_test
+[4]:  https://github.com/cloud8421/osteria
+[5]:  https://github.com/ybur-yug/genstage_tutorial
+[6]:  https://elixirschool.com/en/lessons/advanced/gen-stage
+[7]:  https://gist.github.com/BruOp/fdf6513e2df4274f9266c9cb5ee8a7fb
+[8]:  https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
+[9]:  https://medium.com/@scripbox_tech/background-processing-in-elixir-with-genstage-efb6cb8ca94a
+[10]: https://sheharyar.me/blog/understanding-genstage-elixir/
+[11]: https://blog.emerleite.com/using-elixir-genstage-to-track-video-watch-progress-9b114786c604
+[12]: http://www.elixirfbp.org/2016/07/genstage-example.html
+[13]: http://www.elixirfbp.org/2016/08/genstage-example-no-3-dispatching.html
+[14]: https://github.com/pcmarks/genstage_example
+[15]: https://github.com/pcmarks/genstage_example_2
+[16]: https://github.com/pcmarks/gen_stage_example_3
+      https://hexdocs.pm/gen_stage/GenStage.html
+      https://github.com/elixir-lang/gen_stage
+      http://learningelixir.joekain.com/gen-stage/
+      http://samuelmullen.com/articles/more-than-1-1-with-elixirs-genstage/
+      https://sheharyar.me/blog/understanding-genstage-elixir/
+      https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
