@@ -355,9 +355,9 @@ example in code `lib/gen_server_try/shop_genstage.ex`
 [14]: https://github.com/pcmarks/genstage_example
 [15]: https://github.com/pcmarks/genstage_example_2
 [16]: https://github.com/pcmarks/gen_stage_example_3
-      https://hexdocs.pm/gen_stage/GenStage.html
-      https://github.com/elixir-lang/gen_stage
-      http://learningelixir.joekain.com/gen-stage/
-      http://samuelmullen.com/articles/more-than-1-1-with-elixirs-genstage/
-      https://sheharyar.me/blog/understanding-genstage-elixir/
-      https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
+[17]: https://hexdocs.pm/gen_stage/GenStage.html
+[18]: https://github.com/elixir-lang/gen_stage
+[19]: http://learningelixir.joekain.com/gen-stage/
+[20]: http://samuelmullen.com/articles/more-than-1-1-with-elixirs-genstage/
+[21]: https://sheharyar.me/blog/understanding-genstage-elixir/
+[22]: https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
