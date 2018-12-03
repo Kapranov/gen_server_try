@@ -1,11 +1,13 @@
 # OTP GenServer, GenStage, Agent with Erlang Queue
 
-* `GenServerTry.ShopGenserver` - GenServer example.
-* `GenServerTry.ShopAgent` - Agent example.
-* `GenServerTry.ShopQueue` - Queue example.
+* GenServer example - `GenServerTry.ShopGenserver`
+* Agent example - `GenServerTry.ShopAgent`
+* Queue example - `GenServerTry.ShopQueue`
+* GenStage example - `GenServerTry.ShopGenstage`
 
-`queue` - Abstract data type for FIFO queues. This module provides
-(double-ended) FIFO queues in an efficient manner.
+**queue - Erlang bstract data type for FIFO queues**
+
+`queue` - This module provides (double-ended) FIFO queues in an efficient manner.
 
 ```
 db1 = :queue.new #=> {[], []}
@@ -264,6 +266,22 @@ db1
 #=> ["dataItem1-1", "dataItem1-2", "dataItem1-3"]
 ```
 
+**GenStage OTP**
+
 ### 28 November 2018 by Oleg G.Kapranov
 
 [1]: http://erlang.org/doc/man/queue.html
+[2]: https://youtu.be/M78r_PDlw2c
+[3]: https://github.com/wfgilman/stage_test
+[4]: https://github.com/cloud8421/osteria
+[5]: https://github.com/ybur-yug/genstage_tutorial
+[6]: https://elixirschool.com/en/lessons/advanced/gen-stage
+[7]: https://gist.github.com/BruOp/fdf6513e2df4274f9266c9cb5ee8a7fb
+[8]: https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
+[9]: https://sheharyar.me/blog/understanding-genstage-elixir/
+[10]: https://blog.emerleite.com/using-elixir-genstage-to-track-video-watch-progress-9b114786c604
+[11]: http://www.elixirfbp.org/2016/07/genstage-example.html
+[12]: http://www.elixirfbp.org/2016/08/genstage-example-no-3-dispatching.html
+[13]: https://github.com/pcmarks/genstage_example
+[14]: https://github.com/pcmarks/genstage_example_2
+[15]: https://github.com/pcmarks/gen_stage_example_3

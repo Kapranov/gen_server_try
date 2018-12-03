@@ -44,7 +44,7 @@ defmodule GenServerTry.ShopQueue do
 
       iex> {:ok, pid} = GenServerTry.ShopQueue.start_link
       iex> GenServerTry.ShopQueue.fetch(pid)
-      :empty
+      []
   """
   def fetch(pid), do: GenServer.call(pid, :fetch)
 
@@ -138,7 +138,7 @@ defmodule GenServerTry.ShopQueue do
     with {{:value, item}, new_queue} <- :queue.out(queue) do
       {:reply, item, new_queue}
     else
-      {:empty, _} -> {:reply, :empty, queue}
+      {:empty, _} -> {:reply, [], queue}
     end
   end
 
@@ -172,13 +172,17 @@ defmodule GenServerTry.ShopQueue do
   Invoked to handle asynchronous callback `cast/2` messages: `:update`
   """
   def handle_cast({:update, old_item, new_item}, list) do
+    items = list |> :queue.to_list
+
     [hd|_] =
-      list
+      items
       |> Enum.with_index
       |> Enum.filter(fn {n, _} -> n == old_item end)
       |> Enum.map(fn {_, n} -> n end)
 
-    updated = List.replace_at(list, hd, new_item)
+    replaced = List.replace_at(items, hd, new_item)
+
+    updated = replaced |> :queue.from_list
 
     {:noreply, updated}
   end
