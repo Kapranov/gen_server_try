@@ -44,6 +44,37 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.show(pid)  == [""]
   end
 
+  test "update item", %{pid: pid} do
+    ShopGenstage.add(pid, "item-1")
+
+    assert ShopGenstage.count(pid) == 1
+    assert ShopGenstage.show(pid)  == ["item-1"]
+    assert ShopGenstage.update(pid, "item-1", "item-0")  == :ok
+    assert ShopGenstage.count(pid) == 1
+    assert ShopGenstage.show(pid)  == ["item-0"]
+  end
+
+  test "del some item", %{pid: pid} do
+    items = ~w|item-1 item-2 item-3|s
+    updated = ~w|item-1 item-3|s
+
+    ShopGenstage.add(pid, items)
+    ShopGenstage.del(pid, "item-2")
+
+    assert ShopGenstage.count(pid) == 2
+    assert ShopGenstage.show(pid)  == updated
+  end
+
+  test "del empty item without name", %{pid: pid} do
+    ShopGenstage.add(pid, "item-1")
+    ShopGenstage.add(pid, "")
+
+    assert ShopGenstage.count(pid)   == 2
+    assert ShopGenstage.del(pid, "") == :ok
+    assert ShopGenstage.count(pid)   == 1
+    assert ShopGenstage.show(pid)    == ["item-1"]
+  end
+
   test "fetch returns correct item", %{pid: pid} do
     items = ~w|item-1 item-2 item-3|s
     updated = ~w|item-2 item-3|s

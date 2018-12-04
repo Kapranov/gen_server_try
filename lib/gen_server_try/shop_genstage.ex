@@ -24,6 +24,14 @@ defmodule GenServerTry.ShopGenstage do
   @doc false
   def add(pid, item), do: GenStage.cast(pid, {:add, item})
 
+  @doc false
+  def update(pid, old_item, new_item) do
+    GenStage.cast(pid, {:update, old_item, new_item})
+  end
+
+  @doc false
+  def del(pid, item), do: GenStage.cast(pid, {:del, item})
+
   @impl true
   @doc false
   def init(state), do: {:producer, state}
@@ -53,6 +61,25 @@ defmodule GenServerTry.ShopGenstage do
   @doc false
   def handle_cast({:add, item}, list) do
     updated = [item|list] |> List.flatten
+    {:noreply, [], updated}
+  end
+
+  @doc false
+  def handle_cast({:update, old_item, new_item}, list) do
+    [hd|_] =
+      list
+      |> Enum.with_index
+      |> Enum.filter(fn {n, _} -> n == old_item end)
+      |> Enum.map(fn {_, n} -> n end)
+
+    updated = List.replace_at(list, hd, new_item)
+
+    {:noreply, [], updated}
+  end
+
+  @doc false
+  def handle_cast({:del, item}, list) do
+    updated = Enum.reject(list, &(&1 == item))
     {:noreply, [], updated}
   end
 end
