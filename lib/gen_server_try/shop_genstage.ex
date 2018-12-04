@@ -19,16 +19,30 @@ defmodule GenServerTry.ShopGenstage do
   def count(pid), do: GenStage.call(pid, :count)
 
   @doc false
+  def fetch(pid), do: GenServer.call(pid, :fetch)
+
+  @impl true
+  @doc false
   def init(state), do: {:producer, state}
 
+  @impl true
   @doc false
   def handle_call(:show, _from, list) do
     {:reply, list, [], list}
   end
 
+  @impl true
   @doc false
   def handle_call(:count, _from, list) do
     counter = Enum.count(list)
     {:reply, counter, [], list}
+  end
+
+  @impl true
+  @doc false
+  def handle_call(:fetch, _from, list) do
+    item = list |> List.first
+    updated = Enum.reject(list, &(&1 == item))
+    {:reply, :ok, [], updated}
   end
 end

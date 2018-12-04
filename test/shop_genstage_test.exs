@@ -13,4 +13,12 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.count(pid) == 0
     assert ShopGenstage.show(pid) == []
   end
+
+  test "fetch returns empty list if list is empty", %{pid: pid} do
+    assert ShopGenstage.count(pid) == 0
+    assert ShopGenstage.show(pid)  == []
+    assert ShopGenstage.fetch(pid) == :ok
+    assert ShopGenstage.count(pid) == 0
+    assert ShopGenstage.show(pid)  == []
+  end
 end
