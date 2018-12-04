@@ -19,7 +19,7 @@ defmodule GenServerTry.ShopGenstage do
   def count(pid), do: GenStage.call(pid, :count)
 
   @doc false
-  def fetch(pid), do: GenServer.call(pid, :fetch)
+  def fetch(pid), do: GenStage.call(pid, :fetch)
 
   @impl true
   @doc false
