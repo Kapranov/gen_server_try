@@ -7,15 +7,28 @@ defmodule GenServerTry.ShopGenstage do
 
   @name __MODULE__
 
-  @doc false
-  def start_link(args \\ 0), do: GenStage.start_link(@name, args, name: @name)
+  @doc """
+  Starts the manager.
+  """
+  def start_link, do: GenStage.start_link(@name, [])
 
   @doc false
-  def init(args), do: {:producer, args}
+  def show(pid), do: GenStage.call(pid, :show)
 
   @doc false
-  def handle_demand(demand, state) do
-    events = Enum.to_list(state..(state + demand - 1))
-    {:noreply, events, state + demand}
+  def count(pid), do: GenStage.call(pid, :count)
+
+  @doc false
+  def init(state), do: {:producer, state}
+
+  @doc false
+  def handle_call(:show, _from, list) do
+    {:reply, list, [], list}
+  end
+
+  @doc false
+  def handle_call(:count, _from, list) do
+    counter = Enum.count(list)
+    {:reply, counter, [], list}
   end
 end

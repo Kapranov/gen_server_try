@@ -291,6 +291,10 @@ end
 
 **GenStage OTP**
 
+```
+producer -> producer-consumer -> producer-consumer -> producer-consumer -> consumer
+```
+
 What is GenStage? From the official documentation, it is a
 "specification and computational flow for Elixir", but what does that
 mean.
@@ -336,28 +340,157 @@ onus on the producer to not over-pressure when consumers are busy.
 Now that we've covered the roles within GenStage let's start on our
 example in code `lib/gen_server_try/shop_genstage.ex`
 
+```elixir
+defmodule A do
+  use GenStage
+
+  def start_link(number) do
+    GenStage.start_link(A, number)
+  end
+
+  def init(counter) do
+    {:producer, counter}
+  end
+
+  def handle_demand(demand, counter) when demand > 0 do
+    # If the counter is 3 and we ask for 2 items, we will
+    # emit the items 3 and 4, and set the state to 5.
+    events = Enum.to_list(counter..counter+demand-1)
+    {:noreply, events, counter + demand}
+  end
+end
+
+defmodule B do
+  use GenStage
+
+  def start_link(number) do
+    GenStage.start_link(B, number)
+  end
+
+  def init(number) do
+    {:producer_consumer, number, subscribe_to: [{A, max_demand: 10}]}
+  end
+
+  def handle_events(events, _from, number) do
+    events = Enum.map(events, & &1 * number)
+    {:noreply, events, number}
+  end
+end
+
+defmodule C do
+  use GenStage
+
+  def start_link() do
+    GenStage.start_link(C, :ok)
+  end
+
+  def init(:ok) do
+    {:consumer, :the_state_does_not_matter, subscribe_to: [B]}
+  end
+
+  def handle_events(events, _from, state) do
+    # Wait for a second.
+    Process.sleep(1000)
+
+    # Inspect the events.
+    IO.inspect(events)
+
+    # We are a consumer, so we would never emit items.
+    {:noreply, [], state}
+  end
+end
+
+# If I run them manually it works
+
+iex> GenStage.start_link(A, 0, name: A)
+#=> {:ok, #PID<0.195.0>}
+iex> GenStage.start_link(B, 2, name: B)
+#=> {:ok, #PID<0.197.0>}
+iex> GenStage.start_link(C, :ok)
+#=> {:ok, #PID<0.199.0>}
+[0, 2, 4, 6, 8]
+[10, 12, 14, 16, 18]
+[20, 22, 24, 26, 28]
+[30, 32, 34, 36, 38]
+
+# In a supervision tree, this is often done by starting multiple
+# workers:
+defmodule TestDep.Application do
+  @moduledoc false
+
+  use Application
+
+  def start(_type, _args) do
+    import Supervisor.Spec
+
+    children = [
+      worker(A, [0]),
+      worker(B, [2]),
+      worker(C, []),
+    ]
+
+    opts = [strategy: :rest_for_one]
+    Supervisor.start_link(children, opts)
+  end
+end
+
+# mix.exs
+def application do
+  [
+    extra_applications: [:logger],
+    mod: {TestDep.Application, []}
+  ]
+end
+
+# start_link methods must be updated to receive also the process’s name
+# old
+def start_link(number) do
+  GenStage.start_link(A, number)
+end
+
+# to new
+def start_link(number) do
+  GenStage.start_link(A, number, name: A)
+end
+
+The `doc` doesn't explicitly encourages that although it shows you how to
+call the updated `start_link` function with:
+`GenStage.start_link(A, 0, name: A)`
+```
+
 
 ### 28 November 2018 by Oleg G.Kapranov
 
 [1]:  http://erlang.org/doc/man/queue.html
-[2]:  https://youtu.be/M78r_PDlw2c
-[3]:  https://github.com/wfgilman/stage_test
-[4]:  https://github.com/cloud8421/osteria
-[5]:  https://github.com/ybur-yug/genstage_tutorial
-[6]:  https://elixirschool.com/en/lessons/advanced/gen-stage
-[7]:  https://gist.github.com/BruOp/fdf6513e2df4274f9266c9cb5ee8a7fb
-[8]:  https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
-[9]:  https://medium.com/@scripbox_tech/background-processing-in-elixir-with-genstage-efb6cb8ca94a
-[10]: https://sheharyar.me/blog/understanding-genstage-elixir/
-[11]: https://blog.emerleite.com/using-elixir-genstage-to-track-video-watch-progress-9b114786c604
-[12]: http://www.elixirfbp.org/2016/07/genstage-example.html
-[13]: http://www.elixirfbp.org/2016/08/genstage-example-no-3-dispatching.html
-[14]: https://github.com/pcmarks/genstage_example
-[15]: https://github.com/pcmarks/genstage_example_2
-[16]: https://github.com/pcmarks/gen_stage_example_3
-      https://hexdocs.pm/gen_stage/GenStage.html
-      https://github.com/elixir-lang/gen_stage
-      http://learningelixir.joekain.com/gen-stage/
-      http://samuelmullen.com/articles/more-than-1-1-with-elixirs-genstage/
-      https://sheharyar.me/blog/understanding-genstage-elixir/
-      https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
+[2]:  https://hexdocs.pm/gen_stage/GenStage.html
+[3]:  https://elixirschool.com/en/lessons/advanced/gen-stage
+[4]:  https://www.youtube.com/watch?v=M78r_PDlw2c
+[5]:  https://github.com/elixir-lang/gen_stage
+[6]:  https://github.com/wfgilman/stage_test
+[7]:  https://github.com/billperegoy/gen_stage_example
+[8]:  https://github.com/pcmarks/genstage_example
+[9]:  https://github.com/pcmarks/genstage_example_2
+[10]: https://github.com/pcmarks/gen_stage_example_3
+[11]: https://github.com/cloud8421/osteria
+[12]: https://github.com/ybur-yug/genstage_tutorial
+[13]: https://github.com/brianstorti/elixir-registry-example-chat-app
+[14]: https://github.com/floriank/postgres_sync_file_fdw
+[15]: https://github.com/kloeckner-i/genstage_importer
+[16]: https://github.com/elixir-lang/gen_stage/blob/master/examples/producer_consumer.exs
+[17]: https://becoming-functional.com/getting-started-with-elixirs-genserver-ed05a9202bef
+[18]: https://m.alphasights.com/process-registry-in-elixir-a-practical-example-4500ee7c0dcc
+[19]: https://elixir-lang.org/blog/2016/07/14/announcing-genstage/
+[20]: https://www.slideshare.net/Elixir-Meetup/genstage-and-flow-jose-valim
+[21]: https://work.stevegrossi.com/talks/all-the-worlds-a-gen-stage
+[22]: https://sheharyar.me/blog/understanding-genstage-elixir/
+[23]: http://samuelmullen.com/articles/more-than-1-1-with-elixirs-genstage/
+[24]: https://engineering.spreedly.com/blog/how-do-i-genstage.html
+[25]: http://www.elixirfbp.org/2016/07/genstage-example.html
+[26]: http://www.elixirfbp.org/2016/08/genstage-example-no-2.html
+[27]: http://www.elixirfbp.org/2016/08/genstage-example-no-3-dispatching.html
+[28]: https://medium.com/@scripbox_tech/background-processing-in-elixir-with-genstage-efb6cb8ca94a
+[29]: https://blog.emerleite.com/using-elixir-genstage-to-track-video-watch-progress-9b114786c604
+[30]: https://floriank.github.io/post/the-steel-industry-file_fdw-and-postgres/
+[31]: https://medium.com/@andreichernykh/elixir-a-few-things-about-genstage-id-wish-to-knew-some-time-ago-b826ca7d48ba
+[32]: https://medium.com/mint-digital/stateful-websockets-with-elixirs-genstage-a29eab420c0d
+[33]: https://blog.kloeckner.de/building-a-data-import-pipeline-using-genstage-and-flow/
