@@ -12,7 +12,15 @@ defmodule GenServerTry.ShopGenstage do
   """
   def start_link, do: GenStage.start_link(@name, [], name: @name)
 
-  @doc false
+  @doc """
+  Show all items from cart
+
+  ## Example
+
+      iex> {:ok, pid} = GenServerTry.ShopGenstage.start_link
+      iex> GenServerTry.ShopGenstage.show(pid)
+      []
+  """
   def show(pid), do: GenStage.call(pid, :show)
 
   @doc false
