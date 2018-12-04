@@ -130,8 +130,7 @@ defmodule GenServerTry.ShopGenserver do
   Invoked to handle synchronous callback `call/3` messages: `:show`
   """
   def handle_call(:show, _from, list) do
-    sorted = list |> Enum.sort
-    {:reply, sorted, list}
+    {:reply, list, list}
   end
 
   @impl true

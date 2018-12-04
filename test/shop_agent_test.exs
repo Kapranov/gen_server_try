@@ -22,7 +22,7 @@ defmodule ShopAgentTest do
   end
 
   test "add multiple items", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
 
     ShopAgent.add(pid, items)
 
@@ -55,8 +55,8 @@ defmodule ShopAgentTest do
   end
 
   test "del some item", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
-    updated = ~w|item-1 item-3|s
+    items = ~w|item-3 item-2 item-1|s
+    updated = ~w|item-3 item-1|s
 
     ShopAgent.add(pid, items)
     ShopAgent.del(pid, "item-2")
@@ -76,8 +76,8 @@ defmodule ShopAgentTest do
   end
 
   test "fetch returns correct item", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
-    updated = ~w|item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
+    updated = ~w|item-2 item-1|s
 
     ShopAgent.add(pid, items)
 
@@ -96,7 +96,7 @@ defmodule ShopAgentTest do
   end
 
   test "reset returns empty list", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
 
     ShopAgent.add(pid, items)
 
@@ -108,7 +108,7 @@ defmodule ShopAgentTest do
   end
 
   test "stop genserver and return last items", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
 
     ShopAgent.add(pid, items)
 
