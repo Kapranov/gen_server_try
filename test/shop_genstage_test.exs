@@ -21,6 +21,27 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.show(pid)  == ["item-1"]
   end
 
+  test "add multiple items", %{pid: pid} do
+    items = ~w|item-1 item-2 item-3|s
+
+    ShopGenstage.add(pid, items)
+
+    assert ShopGenstage.count(pid) == 3
+    assert ShopGenstage.show(pid)  == items
+  end
+
+  test "fetch returns correct item", %{pid: pid} do
+    items = ~w|item-1 item-2 item-3|s
+    updated = ~w|item-2 item-3|s
+
+    ShopGenstage.add(pid, items)
+
+    assert ShopGenstage.count(pid) == 3
+    assert ShopGenstage.fetch(pid) == :ok
+    assert ShopGenstage.count(pid) == 2
+    assert ShopGenstage.show(pid)  == updated
+  end
+
   test "fetch returns empty list if list is empty", %{pid: pid} do
     assert ShopGenstage.count(pid) == 0
     assert ShopGenstage.show(pid)  == []
