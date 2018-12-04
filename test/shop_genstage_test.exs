@@ -14,6 +14,13 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.show(pid) == []
   end
 
+  test "add single item", %{pid: pid} do
+    ShopGenstage.add(pid, "item-1")
+
+    assert ShopGenstage.count(pid) == 1
+    assert ShopGenstage.show(pid)  == ["item-1"]
+  end
+
   test "fetch returns empty list if list is empty", %{pid: pid} do
     assert ShopGenstage.count(pid) == 0
     assert ShopGenstage.show(pid)  == []

@@ -21,6 +21,9 @@ defmodule GenServerTry.ShopGenstage do
   @doc false
   def fetch(pid), do: GenStage.call(pid, :fetch)
 
+  @doc false
+  def add(pid, item), do: GenStage.cast(pid, {:add, item})
+
   @impl true
   @doc false
   def init(state), do: {:producer, state}
@@ -44,5 +47,12 @@ defmodule GenServerTry.ShopGenstage do
     item = list |> List.first
     updated = Enum.reject(list, &(&1 == item))
     {:reply, :ok, [], updated}
+  end
+
+  @impl true
+  @doc false
+  def handle_cast({:add, item}, list) do
+    updated = [item|list] |> List.flatten
+    {:noreply, [], updated}
   end
 end
