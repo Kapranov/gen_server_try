@@ -10,7 +10,7 @@ defmodule GenServerTry.ShopGenstage do
   @doc """
   Starts the manager.
   """
-  def start_link, do: GenStage.start_link(@name, [])
+  def start_link, do: GenStage.start_link(@name, [], name: @name)
 
   @doc false
   def show(pid), do: GenStage.call(pid, :show)

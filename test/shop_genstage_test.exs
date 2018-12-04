@@ -21,4 +21,8 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.count(pid) == 0
     assert ShopGenstage.show(pid)  == []
   end
+
+  test "nil name", %{pid: pid} do
+    assert Process.info(pid, :registered_name) == {:registered_name, GenServerTry.ShopGenstage}
+  end
 end
