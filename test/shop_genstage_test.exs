@@ -22,7 +22,7 @@ defmodule ShopGenstageTest do
   end
 
   test "add multiple items", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
 
     ShopGenstage.add(pid, items)
 
@@ -55,8 +55,8 @@ defmodule ShopGenstageTest do
   end
 
   test "del some item", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
-    updated = ~w|item-1 item-3|s
+    items = ~w|item-3 item-2 item-1|s
+    updated = ~w|item-3 item-1|s
 
     ShopGenstage.add(pid, items)
     ShopGenstage.del(pid, "item-2")
@@ -76,8 +76,8 @@ defmodule ShopGenstageTest do
   end
 
   test "fetch returns correct item", %{pid: pid} do
-    items = ~w|item-1 item-2 item-3|s
-    updated = ~w|item-2 item-3|s
+    items = ~w|item-3 item-2 item-1|s
+    updated = ~w|item-2 item-1|s
 
     ShopGenstage.add(pid, items)
 
@@ -93,6 +93,27 @@ defmodule ShopGenstageTest do
     assert ShopGenstage.fetch(pid) == :ok
     assert ShopGenstage.count(pid) == 0
     assert ShopGenstage.show(pid)  == []
+  end
+
+  test "reset returns empty list", %{pid: pid} do
+    items = ~w|item-3 item-2 item-1|s
+
+    ShopGenstage.add(pid, items)
+
+    assert ShopGenstage.count(pid) == 3
+    assert ShopGenstage.show(pid)  == items
+    assert ShopGenstage.reset(pid) == []
+    assert ShopGenstage.count(pid) == 0
+    assert ShopGenstage.show(pid)  == []
+  end
+
+  test "stop genserver and return last items", %{pid: pid} do
+    items = ~w|item-3 item-2 item-1|s
+
+    ShopGenstage.add(pid, items)
+
+    assert ShopGenstage.stop(pid) == :ok
+    assert Process.alive?(pid)     == false
   end
 
   test "nil name", %{pid: pid} do

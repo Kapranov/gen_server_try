@@ -22,6 +22,9 @@ defmodule GenServerTry.ShopGenstage do
   def fetch(pid), do: GenStage.call(pid, :fetch)
 
   @doc false
+  def reset(pid), do: GenServer.call(pid, :reset)
+
+  @doc false
   def add(pid, item), do: GenStage.cast(pid, {:add, item})
 
   @doc false
@@ -31,6 +34,18 @@ defmodule GenServerTry.ShopGenstage do
 
   @doc false
   def del(pid, item), do: GenStage.cast(pid, {:del, item})
+
+  @doc false
+  def stop(pid), do: GenStage.stop(pid, :normal, :infinity)
+
+  @impl true
+  @doc false
+  def terminate(_reason, items) do
+    IO.puts("We are all done shopping.")
+    # credo:disable-for-next-line
+    IO.inspect(items)
+    :ok
+  end
 
   @impl true
   @doc false
@@ -55,6 +70,13 @@ defmodule GenServerTry.ShopGenstage do
     item = list |> List.first
     updated = Enum.reject(list, &(&1 == item))
     {:reply, :ok, [], updated}
+  end
+
+  @impl true
+  @doc false
+  def handle_call(:reset, _from, _list) do
+    list = []
+    {:reply, list, [], list}
   end
 
   @impl true
