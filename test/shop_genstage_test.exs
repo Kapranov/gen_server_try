@@ -2,6 +2,7 @@ defmodule ShopGenstageTest do
   use ExUnit.Case
   doctest GenServerTry.ShopGenstage
 
+  alias GenServerTry.GoodsGenstage
   alias GenServerTry.ShopGenstage
 
   test "shopping starts off empty" do
@@ -133,6 +134,14 @@ defmodule ShopGenstageTest do
 
     assert ShopGenstage.stop(pid) == :ok
     assert Process.alive?(pid)     == false
+  end
+
+  test "producer and consumer work together" do
+    {:ok, shop} = ShopGenstage.start_link()
+    {:ok, goods} = GoodsGenstage.start_link()
+
+    assert Process.alive?(shop) == true
+    assert Process.alive?(goods) == true
   end
 
   test "nil name" do
