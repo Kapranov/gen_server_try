@@ -140,8 +140,19 @@ defmodule ShopGenstageTest do
     {:ok, shop} = ShopGenstage.start_link()
     {:ok, goods} = GoodsGenstage.start_link()
 
-    assert Process.alive?(shop) == true
-    assert Process.alive?(goods) == true
+    ShopGenstage.add(shop, "item-1")
+    ShopGenstage.add(shop, "item-2")
+    ShopGenstage.add(shop, "item-3")
+
+    GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, "item-4")
+    ShopGenstage.add(shop, "item-5")
+    ShopGenstage.add(shop, "item-6")
+
+    Process.sleep(7000)
+
+    assert ShopGenstage.show(shop) == []
   end
 
   test "nil name" do
