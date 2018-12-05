@@ -14,7 +14,10 @@ defmodule GenServerTry.GoodsGenstage do
 
   @impl true
   @doc false
-  def handle_events(goods, _from, state) do
-    {:noreply, goods, state}
+  def handle_events(events, _from, state) do
+    # credo:disable-for-next-line
+    IO.inspect(events, label: "Events being processed")
+    Process.sleep(1000)
+    {:noreply, [], state}
   end
 end

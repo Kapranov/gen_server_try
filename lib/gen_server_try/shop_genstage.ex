@@ -121,7 +121,7 @@ defmodule GenServerTry.ShopGenstage do
 
   @impl true
   @doc false
-  def handle_demand(_demand, state) do
+  def handle_demand(demand, state) when not is_nil(demand) do
     {:noreply, [], state}
   end
 
