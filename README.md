@@ -458,6 +458,140 @@ call the updated `start_link` function with:
 `GenStage.start_link(A, 0, name: A)`
 ```
 
+```elixir
+defmodule Json do
+  def flatten(%{} = json) do
+    json
+    |> Map.to_list()
+    |> to_flat_map(%{})
+  end
+
+  def flatten(%{} = json) when json == %{}, do: %{}
+
+  defp to_flat_map([{_k, %{} = v} | t], acc), do: to_flat_map(Map.to_list(v), to_flat_map(t, acc))
+  defp to_flat_map([{k, v} | t], acc), do: to_flat_map(t, Map.put_new(acc, k, v))
+  defp to_flat_map([], acc), do: acc
+end
+
+%{id: "1", foo: %{bar: %{qux: "hello world"}, baz: 123}}
+|> Json.flatten()
+|> IO.inspect()
+# %{baz: 123, id: "1", qux: "hello world"}
+
+defmodule Foo do
+  def flatten_map(map) when is_map(map) do
+    map
+    |> Map.to_list
+    |> do_flatten([])
+    |> Map.new
+  end
+
+  defp do_flatten([], acc), do: acc
+
+  defp do_flatten([{_k, v} | rest], acc) when is_map(v) do
+    v = Map.to_list(v)
+    flattened_subtree = do_flatten(v, acc)
+    do_flatten(flattened_subtree ++ rest, acc)
+  end
+
+  defp do_flatten([kv | rest], acc) do
+    do_flatten(rest, [kv | acc])
+  end
+end
+
+defmodule Foo do
+  def flatten_map(map) when is_map(map) do
+    map
+    |> Map.to_list
+    |> do_flatten([])
+    |> Map.new
+  end
+
+  defp do_flatten([], acc), do: acc
+
+  defp do_flatten([{_k, v} | rest], acc) when is_map(v) do
+    v = Map.to_list(v)
+    flattened_subtree = do_flatten(v, acc)
+    do_flatten(flattened_subtree ++ rest, acc)
+  end
+
+  defp do_flatten([kv | rest], acc) do
+    do_flatten(rest, [kv | acc])
+    end
+  end
+end
+
+def flatten_map(list) when is_list(list) do
+  list
+  |> do_flatten([])
+  |> Map.new
+end
+
+defp do_flatten([{_k, v} | rest], acc) when is_map(v) do
+  v = Map.to_list(v)
+  flattened_subtree = do_flatten(v, acc)
+  do_flatten(flattened_subtree ++ rest, acc)
+end
+```
+
+```elixir
+def flatten(list), do: flatten(list, []) |> Enum.reverse
+def flatten([h | t], acc) when h == [], do: flatten(t, acc)
+def flatten([h | t], acc) when is_list(h), do: flatten(t, flatten(h,
+acc))
+def flatten([h | t], acc), do: flatten(t, [h | acc])
+def flatten([], acc), do: acc
+
+def flatten(list), do: flatten(list, [])
+def flatten([h | t], acc) when h == [], do: flatten(t, acc)
+def flatten([h | t], acc) when is_list(h), do: flatten(t, flatten(h,
+acc))
+def flatten([h | t], acc), do: flatten(t, acc ++ [h])
+def flatten([], acc), do: acc
+
+defmodule FlattenReverse do
+  def flatten(list), do: flatten(list, []) |> Enum.reverse
+  def flatten([h | t], acc) when h == [], do: flatten(t, acc)
+  def flatten([h | t], acc) when is_list(h), do: flatten(t, flatten(h, acc))
+  def flatten([h | t], acc), do: flatten(t, [h | acc])
+  def flatten([], acc), do: acc
+end
+defmodule FlattenAppend do
+  def flatten(list), do: flatten(list, [])
+  def flatten([h | t], acc) when h == [], do: flatten(t, acc)
+  def flatten([h | t], acc) when is_list(h), do: flatten(t, flatten(h, acc))
+  def flatten([h | t], acc), do: flatten(t, acc ++ [h])
+  def flatten([], acc), do: acc
+end
+list = List.duplicate(0, 200) |> List.duplicate(200)
+{time, _} = :timer.tc fn -> FlattenReverse.flatten(list) end
+IO.puts "Flatten reverse took #{time}"
+{time, _} = :timer.tc fn -> FlattenAppend.flatten(list) end
+IO.puts "Flatten append took #{time}"
+
+def flatten(list), do: flatten(list, [])
+def flatten([h | t], acc), do: flatten(t, h ++ acc)
+def flatten([], acc), do: acc
+
+List.foldl(list, [], &(&1 ++ &2))
+
+defmodule List do
+  def flatten(list, depth \\ -2), do: flatten(list, depth + 1, []) |> Enum.reverse
+  def flatten(list, 0, acc), do: [list | acc]
+  def flatten([h | t], depth, acc) when h == [], do: flatten(t, depth, acc)
+  def flatten([h | t], depth, acc) when is_list(h), do: flatten(t, depth, flatten(h, depth - 1, acc))
+  def flatten([h | t], depth, acc), do: flatten(t, depth, [h | acc])
+  def flatten([], _, acc), do: acc
+end
+list = [[1], 2, [[3, 4], 5], [[[]]], [[[6]]], 7, 8, []]
+List.flatten(list, 0)   # [[1], 2, [[3, 4], 5], [[[]]], [[[6]]], 7, 8]
+List.flatten(list, 1)   # [1, 2, [3, 4], 5, [[]], [[6]], 7, 8]
+List.flatten(list, 2)   # [1, 2, 3, 4, 5, [6], 7, 8]
+List.flatten(list, 3)   # [1, 2, 3, 4, 5, 6, 7, 8]
+List.flatten(list)      # [1, 2, 3, 4, 5, 6, 7, 8]
+List.flatten(list, -1)   # [[[1], 2, [[3, 4], 5], [[[]]], [[[6]]], 7, 8, []]]
+
+```
 
 ### 28 November 2018 by Oleg G.Kapranov
 
