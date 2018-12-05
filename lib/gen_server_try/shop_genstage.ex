@@ -120,6 +120,12 @@ defmodule GenServerTry.ShopGenstage do
   def init(state), do: {:producer, state}
 
   @impl true
+  @doc false
+  def handle_demand(_demand, state) do
+    {:noreply, [], state}
+  end
+
+  @impl true
   @doc """
   Invoked to handle synchronous callback `call/3` messages: `:show`
   """
@@ -160,7 +166,7 @@ defmodule GenServerTry.ShopGenstage do
   Invoked to handle asynchronous callback `cast/2` messages: `:add`
   """
   def handle_cast({:add, item}, list) do
-    updated = [item|list] |> List.flatten
+    updated = list ++ [item] |> List.flatten
     {:noreply, [], updated}
   end
 

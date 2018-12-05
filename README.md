@@ -593,6 +593,47 @@ List.flatten(list, -1)   # [[[1], 2, [[3, 4], 5], [[[]]], [[[6]]], 7, 8, []]]
 
 ```
 
+```elixir
+defmodule MySigils do
+  @moduledoc ~S"""
+  Genrating the custom sigils.
+  """
+  @doc ~S"""
+  This converts the given strings in to the path by joining each string
+with /.
+  If you provide an option `u` it will treat the first string as domain
+and prepend
+  that string with https://www. and add the rest of strings as path.
+  """
+
+  ##  Examples
+
+        iex> ~p/user 1234 delete/
+        "user/1234/delete"
+
+        iex> ~p/medium.com blackode/u
+        "https://www.medium.com/blackode"
+  """
+
+  def sigil_p binary, [] do
+    binary
+    |> String.split
+    |> Enum.join("/")
+  end
+
+  def sigil_p binary, [?u] do
+    string_list = String.split binary
+    "https://www." <> Enum.join(string_list, "/")
+  end
+end
+
+h MySigils.sigil_p
+import MySigils
+~p/user 123 delete/
+ ~p/medium.com blackode/
+ ~p/medium.com blackode/u
+```
+
 ### 28 November 2018 by Oleg G.Kapranov
 
 [1]:  http://erlang.org/doc/man/queue.html
