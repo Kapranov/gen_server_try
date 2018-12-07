@@ -137,21 +137,40 @@ defmodule ShopGenstageTest do
   end
 
   test "producer and consumer work together" do
-    {:ok, shop} = ShopGenstage.start_link()
-    {:ok, goods} = GoodsGenstage.start_link()
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods} = GoodsGenstage.start_link
 
-    foods1 = ~w(item-1 item-2 item-3)
-    foods2 = ~w(item-4 item-5 item-6)
-
-    ShopGenstage.add(shop, foods1)
+    ShopGenstage.add(shop, "item-1")
+    ShopGenstage.add(shop, "item-2")
+    ShopGenstage.add(shop, "item-3")
 
     GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
 
-    ShopGenstage.add(shop, foods2)
+    ShopGenstage.add(shop, "item-4")
+    ShopGenstage.add(shop, "item-5")
+    ShopGenstage.add(shop, "item-6")
 
-    Process.sleep(3000)
+    Process.sleep(6000)
 
-    assert ShopGenstage.show(shop) == foods1 ++ foods2
+    assert ShopGenstage.show(shop) == []
+  end
+
+  test "producer and consumer work together with array queue" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods} = GoodsGenstage.start_link
+
+    items_1 = ~w(item-1 item-2 item-3)
+    items_2 = ~w(item-4 item-5 item-6)
+
+    ShopGenstage.add(shop, items_1)
+
+    GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, items_2)
+
+    Process.sleep(6000)
+
+    assert ShopGenstage.show(shop) == []
   end
 
   test "nil name" do

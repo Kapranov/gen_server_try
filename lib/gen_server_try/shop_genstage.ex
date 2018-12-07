@@ -121,8 +121,20 @@ defmodule GenServerTry.ShopGenstage do
 
   @impl true
   @doc false
-  def handle_demand(demand, state) when not is_nil(demand) do
-    {:noreply, [], state}
+  def handle_demand(demand, []) when demand == 1 do
+    {:noreply, [], []}
+  end
+
+  @impl true
+  @doc false
+  def handle_demand(demand, [head|tail] = list) when demand == 1 do
+    if Kernel.length(list) > 0 do
+      # strftime_str = Timex.format!(Timex.now, "%H:%M:%S %F", :strftime)
+      # IO.puts("#{__MODULE__}::handle_demand @ #{strftime_str}")
+      {:noreply, [head], tail}
+    else
+      {:noreply, [], list}
+    end
   end
 
   @impl true
