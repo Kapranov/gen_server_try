@@ -136,6 +136,10 @@ defmodule ShopGenstageTest do
     assert Process.alive?(pid)     == false
   end
 
+  test "check out function run" do
+    assert {:ok, _} = ShopGenstage.run
+  end
+
   test "producer and consumer work together" do
     {:ok, shop} = ShopGenstage.start_link
     {:ok, goods} = GoodsGenstage.start_link

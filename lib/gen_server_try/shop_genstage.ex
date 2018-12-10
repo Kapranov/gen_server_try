@@ -1,11 +1,16 @@
 defmodule GenServerTry.ShopGenstage do
   @moduledoc """
-  This is a simple example of setting up a data flow using the GenStage behaviour.
+  Basic example of using a single Producer and single Consumer with GenStage
   """
+
+  alias GenServerTry.GoodsGenstage
+  alias GenServerTry.ShopGenstage
 
   use GenStage
 
+  @max 1
   @name __MODULE__
+  @goods ~w(item-1 item-2 item-3 item-4 item-5 item-6 item-7 item-8 item-9)
 
   @doc """
   Starts the manager.
@@ -115,22 +120,53 @@ defmodule GenServerTry.ShopGenstage do
     :ok
   end
 
+  @doc """
+  Start a basic Producer-Consumer example of GenStage.
+
+  We create one producer and initialize its state with a list of 9
+  and one consumer. The buttom line we tell `consumer` to subscribe
+  to request elements from `producer`
+  """
+  def run do
+    things_to_process =
+      (@goods)
+      |> Enum.to_list
+
+    {:ok, producer} = GenStage.start_link(ShopGenstage, things_to_process)
+    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :no_state)
+
+    GenStage.sync_subscribe(consumer, to: producer, max_demand: @max)
+  end
+
   @impl true
   @doc false
   def init(state), do: {:producer, state}
 
   @impl true
-  @doc false
-  def handle_demand(demand, []) when demand == 1 do
+  @doc """
+  `handle_demand` is the callback Producers must implement
+
+   The first argument is the `demand`, the number of "things"
+   the consumer is requesting; in this case, the item of
+   elements from the list on the current moment list is empty
+  """
+  def handle_demand(demand, []) when not is_nil(demand) do
     {:noreply, [], []}
   end
 
   @impl true
-  @doc false
-  def handle_demand(demand, [head|tail] = list) when demand == 1 do
+  @doc """
+  Callback `handle_demand` in this case the list just follow add
+  item of an element to a list and must return a head list or empty list.
+  """
+  def handle_demand(demand, [head|tail] = list) when not is_nil(demand) do
     if Kernel.length(list) > 0 do
       # strftime_str = Timex.format!(Timex.now, "%H:%M:%S %F", :strftime)
       # IO.puts("#{__MODULE__}::handle_demand @ #{strftime_str}")
+      IO.puts("Producer - #{demand} of my #{Kernel.length(list)} elements requested.")
+
+      {produced, leftover} = Enum.split(list, demand)
+      IO.puts("Producer - Sending #{demand} items (#{inspect(produced, charlists: :as_lists)}) Have #{Kernel.length(leftover)} left.")
       {:noreply, [head], tail}
     else
       {:noreply, [], list}
