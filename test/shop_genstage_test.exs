@@ -2,8 +2,7 @@ defmodule ShopGenstageTest do
   use ExUnit.Case
   doctest GenServerTry.ShopGenstage
 
-  alias GenServerTry.GoodsGenstage
-  alias GenServerTry.ShopGenstage
+  alias GenServerTry.{GoodsGenstage, ShopGenstage}
 
   test "shopping starts off empty" do
     {:ok, pid} = ShopGenstage.start_link
