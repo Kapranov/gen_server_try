@@ -139,6 +139,21 @@ defmodule ShopGenstageTest do
     assert {:ok, _} = ShopGenstage.run
   end
 
+  test "empty queue wth producer and consumer work together" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods} = GoodsGenstage.start_link
+
+    ShopGenstage.add(shop, [])
+
+    GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
+
+    Process.sleep(1000)
+
+    ShopGenstage.add(shop, [])
+
+    assert ShopGenstage.show(shop) == []
+  end
+
   test "producer and consumer work together" do
     {:ok, shop} = ShopGenstage.start_link
     {:ok, goods} = GoodsGenstage.start_link
@@ -172,6 +187,110 @@ defmodule ShopGenstageTest do
     ShopGenstage.add(shop, items_2)
 
     Process.sleep(6000)
+
+    assert ShopGenstage.show(shop) == []
+  end
+
+  test "can handle new items after queue is empty" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods} = GoodsGenstage.start_link
+
+    ShopGenstage.add(shop, "item-1")
+    ShopGenstage.add(shop, "item-2")
+    ShopGenstage.add(shop, "item-3")
+
+    GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, "item-4")
+    ShopGenstage.add(shop, "item-5")
+    ShopGenstage.add(shop, "item-6")
+
+    Process.sleep(6000)
+
+    assert ShopGenstage.show(shop) == []
+
+    ShopGenstage.add(shop, "item-7")
+
+    Process.sleep(1000)
+
+    assert ShopGenstage.show(shop) == []
+
+    ShopGenstage.add(shop, "item-8")
+
+    Process.sleep(1000)
+
+    assert ShopGenstage.show(shop) == []
+  end
+
+  test "can handle new array items after queue is empty" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods} = GoodsGenstage.start_link
+
+    items_1 = ~w(item-1 item-2 item-3)
+    items_2 = ~w(item-4 item-5 item-6)
+    items_3 = ~w(item-7 item-8)
+    items_4 = ~w(item-9)
+
+    ShopGenstage.add(shop, items_1)
+
+    GenStage.sync_subscribe(goods, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, items_2)
+
+    Process.sleep(6000)
+
+    assert ShopGenstage.show(shop) == []
+
+    ShopGenstage.add(shop, items_3)
+
+    Process.sleep(2000)
+
+    assert ShopGenstage.show(shop) == []
+
+    ShopGenstage.add(shop, items_4)
+
+    Process.sleep(1000)
+
+    assert ShopGenstage.show(shop) == []
+  end
+
+  test "multiple consumers speed up process" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods_1} = GoodsGenstage.start_link
+    {:ok, goods_2} = GoodsGenstage.start_link
+
+    ShopGenstage.add(shop, "item-1")
+    ShopGenstage.add(shop, "item-2")
+    ShopGenstage.add(shop, "item-3")
+
+    GenStage.sync_subscribe(goods_1, to: shop, max_demand: 1)
+    GenStage.sync_subscribe(goods_2, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, "item-4")
+    ShopGenstage.add(shop, "item-5")
+    ShopGenstage.add(shop, "item-6")
+
+    Process.sleep(3000)
+
+    assert ShopGenstage.show(shop) == []
+  end
+
+  test "multiple consumers speed up process with array queue" do
+    {:ok, shop} = ShopGenstage.start_link
+    {:ok, goods_1} = GoodsGenstage.start_link
+    {:ok, goods_2} = GoodsGenstage.start_link
+
+    items_1 = ~w(item-1 item-2 item-3)
+    items_2 = ~w(item-4 item-5 item-6)
+
+    ShopGenstage.add(shop, items_1)
+
+    GenStage.sync_subscribe(goods_1, to: shop, max_demand: 1)
+    GenStage.sync_subscribe(goods_2, to: shop, max_demand: 1)
+
+    ShopGenstage.add(shop, items_2)
+
+    Process.sleep(3000)
 
     assert ShopGenstage.show(shop) == []
   end
