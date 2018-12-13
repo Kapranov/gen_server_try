@@ -161,10 +161,8 @@ defmodule GenServerTry.ShopGenstage do
   """
   def handle_demand(demand, [head|tail] = list) when not is_nil(demand) do
     if Kernel.length(list) > 0 do
-      # strftime_str = Timex.format!(Timex.now, "%H:%M:%S %F", :strftime)
-      # IO.puts("#{__MODULE__}::handle_demand @ #{strftime_str}")
-      IO.puts("Producer - #{demand} of my #{Kernel.length(list)} elements requested.")
-
+      strftime_str = Timex.format!(Timex.now, "%H:%M:%S %F", :strftime)
+      IO.puts("Producer - #{demand} of my #{Kernel.length(list)} elements requested on dated #{strftime_str}.")
       {produced, leftover} = Enum.split(list, demand)
       IO.puts("Producer - Sending #{demand} items (#{inspect(produced, charlists: :as_lists)}) Have #{Kernel.length(leftover)} left.")
       {:noreply, [head], tail}

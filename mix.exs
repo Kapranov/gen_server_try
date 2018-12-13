@@ -36,6 +36,7 @@ defmodule GenServerTry.MixProject do
       {:ex_unit_notifier, "~> 0.1.4", only: :test},
       {:gen_stage, "~> 0.14.1"},
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
+      {:timex, "~> 3.4"},
       {:remix, "~> 0.0.2", only: :dev}
     ]
   end
