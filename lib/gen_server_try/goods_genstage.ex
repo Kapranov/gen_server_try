@@ -12,7 +12,7 @@ defmodule GenServerTry.GoodsGenstage do
 
   @impl true
   @doc false
-  def init(_), do: {:consumer, :no_state}
+  def init(_), do: {:consumer, :nothing}
 
   @impl true
   @doc """
@@ -32,9 +32,9 @@ defmodule GenServerTry.GoodsGenstage do
   """
   def handle_events(events, _from, state) do
     Process.sleep(1000)
-    events = Enum.map(events , &(&1))
+
     # credo:disable-for-next-line
-    IO.inspect(events, label: "Consumer - Received #{Kernel.length(events)}")
+    IO.inspect(events, charlists: :as_lists, label: "Consumer - Received")
 
     {:noreply, [], state}
   end

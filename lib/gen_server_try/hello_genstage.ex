@@ -35,8 +35,8 @@ defmodule GenServerTry.HelloGenstage do
       |> Enum.to_list
 
     {:ok, producer} = GenStage.start_link(ShopGenstage, things_to_process)
-    {:ok, producer_consumer} = GenStage.start_link(ItemsGenstage, :no_state)
-    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :no_state)
+    {:ok, producer_consumer} = GenStage.start_link(ItemsGenstage, :nothing)
+    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :nothing)
 
     GenStage.sync_subscribe(consumer, to: producer_consumer, max_demand: @max)
     GenStage.sync_subscribe(producer_consumer, to: producer, max_demand: @max)
@@ -63,8 +63,8 @@ defmodule GenServerTry.HelloGenstage do
       |> Enum.to_list
 
     {:ok, producer} = GenStage.start_link(ShopGenstage, items_to_process)
-    {:ok, producer_consumer} = GenStage.start_link(ItemsGenstage, :no_state)
-    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :no_state)
+    {:ok, producer_consumer} = GenStage.start_link(ItemsGenstage, :nothing)
+    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :nothing)
 
     GenStage.sync_subscribe(consumer, to: producer_consumer, max_demand: @step)
     GenStage.sync_subscribe(producer_consumer, to: producer, max_demand: @step)

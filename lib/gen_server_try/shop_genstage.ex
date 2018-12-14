@@ -133,7 +133,7 @@ defmodule GenServerTry.ShopGenstage do
       |> Enum.to_list
 
     {:ok, producer} = GenStage.start_link(ShopGenstage, things_to_process)
-    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :no_state)
+    {:ok, consumer} = GenStage.start_link(GoodsGenstage, :nothing)
 
     GenStage.sync_subscribe(consumer, to: producer, max_demand: @max)
   end
@@ -162,9 +162,13 @@ defmodule GenServerTry.ShopGenstage do
   def handle_demand(demand, [head|tail] = list) when not is_nil(demand) do
     if Kernel.length(list) > 0 do
       strftime_str = Timex.format!(Timex.now, "%H:%M:%S %F", :strftime)
-      IO.puts("Producer - #{demand} of my #{Kernel.length(list)} elements requested on dated #{strftime_str}.")
+
+      IO.puts("Producer - #{demand} of my #{Kernel.length(list)} elements requested at #{strftime_str}.")
+
       {produced, leftover} = Enum.split(list, demand)
-      IO.puts("Producer - Sending #{demand} items (#{inspect(produced, charlists: :as_lists)}) Have #{Kernel.length(leftover)} left.")
+
+      IO.puts("Producer - Sending #{demand} item (#{inspect(produced, charlists: :as_lists)}) Have #{Kernel.length(leftover)} left.")
+
       {:noreply, [head], tail}
     else
       {:noreply, [], list}
