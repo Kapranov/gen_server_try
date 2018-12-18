@@ -634,6 +634,20 @@ import MySigils
  ~p/medium.com blackode/u
 ```
 
+# Tasks
+
+```elixir
+defmodule Fib do
+  def of(0), do: 0
+  def of(1), do: 1
+  def of(n), do: Fib.of(n-1) + Fib.of(n-2)
+end
+
+worker = Task.async(fn -> Fib.of(20) end)
+result = Task.await(worker)
+result
+```
+
 ### 28 November 2018 by Oleg G.Kapranov
 
 [1]:  http://erlang.org/doc/man/queue.html
